@@ -1,0 +1,16 @@
+body{
+    background-color: #FFE2B8;
+}
+
+p,ol,ul{
+    font-family: Helvetica;
+    font-weight: bold;
+}
+table
+{
+    border: 1px solid saddlebrown;
+    width: 600;
+}
+canvas{
+    border: 1px solid black;
+}
