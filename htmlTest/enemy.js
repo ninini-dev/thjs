@@ -28,9 +28,21 @@ class EnemySystem{
         this.hp.pop();
     }
     
+    t=0;
     update(delta) {
+        if(this.x.length==0)return;
         this.map.clear();
+        if(this.t<1) this.t+=1/120;
         for (let i = 0; i < this.x.length; ) {
+            
+            let nPos=bezierEase(
+                {x:50,y:120},
+                {x:150,y:360},
+                {x:150,y:120},
+                {x:2,y:360},
+                this.t
+            );
+            this.x[i]=nPos.x; this.y[i]=nPos.y;
             let ePos={x:this.x[i],y:this.y[i]};
             
             this.hp[i]-=plSys.mapCol(ePos);
