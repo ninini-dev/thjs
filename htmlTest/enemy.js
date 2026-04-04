@@ -13,6 +13,9 @@ class EnemySystem{
     pcur=[];
     asp=[];
 
+    dmgAudio=new Audio("res/wav/se_damage00.wav");
+
+
     mapAdd(pos,value){
         if(this.map.has(pos)) this.map.get(pos).push(value);
         else this.map.set(pos,[value]);
@@ -67,7 +70,14 @@ class EnemySystem{
            
             let ePos={x:this.x[i],y:this.y[i]};
             
-            this.hp[i]-=plSys.mapCol(ePos);
+            let dmg= plSys.mapCol(ePos);
+            if(dmg>0){
+                if(this.dmgAudio.currentTime>.04)
+                this.dmgAudio.currentTime=0;
+                this.dmgAudio.play();
+                
+            }
+            this.hp[i]-=dmg;
             if(this.hp[i]<=0){
                 dropSys.add(this.x[i],this.y[i],DropType.HP_FRAG);
                 this.remove(i);

@@ -113,6 +113,7 @@ function gameLoop(){
         enmSys.update(1);
         dropSys.update(1);
         plSys.update(1);
+        eventLoop();
         debugGrid();
     }
     window.requestAnimationFrame(gameLoop); 

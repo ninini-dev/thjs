@@ -34,6 +34,7 @@ class DropSystem{
             
             if(this.y[i]>496){
                 this.remove(i);
+                document.getElementById('score').textContent='Score: '+10;
                 continue;
             }
             

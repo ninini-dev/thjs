@@ -1,0 +1,29 @@
+-create enm momevemnt relative to position origin
+-collsion optimization
+-audio
+-enm drop list
+-game events
+-scoring
+-particles
+-bg
+-bgm
+-power sys
+-text score
+-enm shooting
+
+Event{
+  enmData{
+    hp
+    aspect
+  }
+  posArr{
+    x
+    y
+  }
+  pathFirst
+  pathLen
+  enmAmount
+  time
+  repeats
+  delay
+}
