@@ -9,6 +9,9 @@ btImg.src="res/etama.png"
 let enmSys=new EnemySystem();
 enmSys.img.src="res/enemy.png"
 
+let dropSys=new DropSystem();
+dropSys.img.src="res/item.png"
+
 let plSys=new PlBtSystem();
 
 function main(){
@@ -39,7 +42,7 @@ function input(){
         const dir=randomDir();
         btSys.add(100,240,dir.x,dir.y,dir.a);
         const pos= randomPos();
-        enmSys.add(pos.x,pos.y,4);
+        enmSys.add(pos.x,pos.y,4,EnemyAspect.TINY_GOLD,2,0);
     }
 }
 // Update the 'keys' object on keydown and keyup events
@@ -96,7 +99,8 @@ let btSys=new BulletSystem();
 
 let lastTime=Date.now();
 function gameLoop(){
-    if(Date.now()-lastTime>1/60){
+    let timeStep=1/60;
+    if(Date.now()-lastTime>timeStep){
         lastTime=Date.now();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         input();
@@ -107,6 +111,7 @@ function gameLoop(){
             
         }
         enmSys.update(1);
+        dropSys.update(1);
         plSys.update(1);
         debugGrid();
     }
