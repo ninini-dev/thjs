@@ -85,3 +85,9 @@ const DROP_ASPECT_DATA = Object.freeze({
     [DropType.FAITH]:{x:208, y:0, w:16},
 });
 
+const drops=[
+    [
+    {type:DropType.FAITH, amount:5, rmin:10,rmax:20},
+    {type:DropType.POWER, amount:5, rmin:0,rmax:10}
+    ]
+]

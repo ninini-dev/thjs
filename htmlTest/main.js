@@ -41,8 +41,6 @@ function input(){
     if(keys["KeyZ"]==true){
         const dir=randomDir();
         btSys.add(100,240,dir.x,dir.y,dir.a);
-        const pos= randomPos();
-        enmSys.add(pos.x,pos.y,4,EnemyAspect.TINY_GOLD,2,0);
     }
 }
 // Update the 'keys' object on keydown and keyup events

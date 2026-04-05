@@ -12,6 +12,7 @@ class EnemySystem{
     pleft=[];
     pcur=[];
     asp=[];
+    drop=[];
 
     dmgAudio=new Audio("res/wav/se_damage00.wav");
 
@@ -21,7 +22,7 @@ class EnemySystem{
         else this.map.set(pos,[value]);
     }
     
-    add(x,y,hp,asp,pleft,pcur){    
+    add(x,y,hp,asp,pleft,pcur,dropId){    
         this.x.push(x);
         this.y.push(y);
         this.hp.push(hp);
@@ -29,6 +30,7 @@ class EnemySystem{
         this.asp.push(asp);
         this.pleft.push(pleft);
         this.pcur.push(pcur);
+        this.drop.push(dropId);
     }
     remove(i){
         this.x[i]=this.x.at(-1);
@@ -38,6 +40,7 @@ class EnemySystem{
         this.asp[i]=this.asp.at(-1);
         this.pleft[i]=this.pleft.at(-1);
         this.pcur[i]=this.pcur.at(-1);
+        this.drop[i]=this.drop.at(-1);
         this.x.pop();
         this.y.pop();
         this.hp.pop();
@@ -45,6 +48,7 @@ class EnemySystem{
         this.asp.pop();
         this.pleft.pop();
         this.pcur.pop();
+        this.drop.pop();
     }
     
     update(delta) {
@@ -79,7 +83,16 @@ class EnemySystem{
             }
             this.hp[i]-=dmg;
             if(this.hp[i]<=0){
-                dropSys.add(this.x[i],this.y[i],DropType.HP_FRAG);
+                let dataList=drops[this.drop[i]];
+                for (let j = 0; j < dataList.length; j++) {
+                    const data=dataList[j];
+                    for (let k = 0; k < data.amount; k++) {
+                        const off = randomDir();
+                        const r= Math.floor(Math.random() * (data.rmax - data.rmin + 1)) + data.rmin;
+                        off.x*=r; off.y*=r;
+                        dropSys.add(this.x[i]+off.x,this.y[i]+off.y,data.type);
+                    }
+                }
                 this.remove(i);
                 continue;
             }
