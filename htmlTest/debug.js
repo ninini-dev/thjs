@@ -56,6 +56,6 @@ function editor(){
     ctx.strokeStyle = 'blue';
     ctx.stroke();
     
-    window.requestAnimationFrame(editor); 
+    //window.requestAnimationFrame(editor); 
 }
-    window.requestAnimationFrame(editor); 
+    //window.requestAnimationFrame(editor); 

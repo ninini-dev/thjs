@@ -16,7 +16,8 @@ let plSys=new PlBtSystem();
 
 function main(){
     canvas = document.getElementById("gameCanvas");
-	ctx = canvas.getContext("2d");
+//	ctx = canvas.getContext("2d");
+ctx=canvas.getContext('webgpu');
 /*
     ctx.strokeStyle = "Blue";
     ctx.beginPath();
@@ -91,7 +92,6 @@ function debugGrid(){
 }
 main();
 plImg.onload=()=>{};
-
 //
 let btSys=new BulletSystem();
 
@@ -114,8 +114,6 @@ function gameLoop(){
         eventLoop();
         debugGrid();
     }
-    window.requestAnimationFrame(gameLoop); 
+    //window.requestAnimationFrame(gameLoop); 
 }
-window.requestAnimationFrame(gameLoop); 
-
-
+//window.requestAnimationFrame(gameLoop); 
