@@ -1,5 +1,8 @@
 device=[];
 vertexData=[];
+storageBuffer=[];
+bindGroup=[];
+pipeline=[];
 function createBuffer(){
     const vertexData = new Float32Array([
       -32/300,-32/480,
@@ -16,6 +19,29 @@ vertexBuffer = device.createBuffer({
 device.queue.writeBuffer(vertexBuffer, 0, vertexData);
 
 }
+
+function createSSBO(){
+  
+const bufferSize=3;
+storageBuffer = device.createBuffer({
+  size: 8*bufferSize,
+  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+});
+ bindGroup = device.createBindGroup({
+    label: 'bind group for objects',
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: storageBuffer },
+    ],
+  });
+  const instanceData = new Float32Array([
+      -200/300,-200/480,
+      -200/300,200/480,
+      200/300,-200/480,
+]);
+  device.queue.writeBuffer(storageBuffer, 0, instanceData);
+
+}
 async function rend(){
 const adapter = await navigator.gpu.requestAdapter();
 device = await adapter.requestDevice();
@@ -30,14 +56,18 @@ const shaderCode = `
 struct VertexInput {
     @location(0) position: vec2<f32>,
 };
+struct InstanceData {
+    offset: vec2<f32>,
+};
+
+@group(0) @binding(0) var<storage, read> pos_per_ins: array<InstanceData>;
 @vertex
-fn vs_main(input: VertexInput, @builtin(vertex_index) vertexIndex : u32) -> @builtin(position) vec4f {
-  var pos = array<vec2f, 3>(
-    vec2f(0.0, 0.5),   // Top
-    vec2f(-0.5, -0.5), // Bottom Left
-    vec2f(0.5, -0.5)   // Bottom Right
-  );
-  return vec4f(input.position, 0.0, 1.0);
+fn vs_main(
+  input: VertexInput,
+  @builtin(instance_index) instanceIndex: u32 ,
+  @builtin(vertex_index) vertexIndex : u32
+  ) -> @builtin(position) vec4f {
+  return vec4f( input.position+pos_per_ins[instanceIndex].offset, 0.0, 1.0);
 }
 
 @fragment
@@ -48,7 +78,7 @@ fn fs_main() -> @location(0) vec4f {
 
 const shaderModule = device.createShaderModule({ code: shaderCode });
 createBuffer();
-const pipeline = device.createRenderPipeline({
+pipeline = device.createRenderPipeline({
   layout: 'auto',
   vertex: {
     module: shaderModule,
@@ -85,7 +115,11 @@ const renderPass = commandEncoder.beginRenderPass({
 
 renderPass.setPipeline(pipeline);
 renderPass.setVertexBuffer(0, vertexBuffer); 
-renderPass.draw(4); // Draw 3 vertices
+
+createSSBO();
+renderPass.setBindGroup(0, bindGroup);
+
+renderPass.draw(4,3); // Draw 3 vertices
 renderPass.end();
 
 device.queue.submit([commandEncoder.finish()]);
