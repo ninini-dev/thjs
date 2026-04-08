@@ -2,10 +2,10 @@ device=[];
 vertexData=[];
 function createBuffer(){
     const vertexData = new Float32Array([
-  // X,  Y,  Z (Posición)
-   0.0,  0.5, 
-  -0.5, -0.5, 
-   0.5, -0.5, 
+      -32/300,-32/480,
+      -32/300,32/480,
+      32/300,-32/480,
+      32/300,32/480,
 ]);
 vertexBuffer = device.createBuffer({
   size: vertexData.byteLength,
@@ -37,7 +37,7 @@ fn vs_main(input: VertexInput, @builtin(vertex_index) vertexIndex : u32) -> @bui
     vec2f(-0.5, -0.5), // Bottom Left
     vec2f(0.5, -0.5)   // Bottom Right
   );
-  return vec4f(pos[vertexIndex], 0.0, 1.0);
+  return vec4f(input.position, 0.0, 1.0);
 }
 
 @fragment
@@ -68,7 +68,7 @@ const pipeline = device.createRenderPipeline({
     targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
   },
   primitive: {
-    topology: 'triangle-list',
+    topology: 'triangle-strip',
   },
 });
 const commandEncoder = device.createCommandEncoder();
@@ -85,7 +85,7 @@ const renderPass = commandEncoder.beginRenderPass({
 
 renderPass.setPipeline(pipeline);
 renderPass.setVertexBuffer(0, vertexBuffer); 
-renderPass.draw(3); // Draw 3 vertices
+renderPass.draw(4); // Draw 3 vertices
 renderPass.end();
 
 device.queue.submit([commandEncoder.finish()]);

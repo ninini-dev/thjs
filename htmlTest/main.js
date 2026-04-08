@@ -29,7 +29,6 @@ ctx=canvas.getContext('webgpu');
 }
 const keys = {};
 
-
 function input(){
     var s=(keys["ShiftLeft"])?2.5:5;
     x += s*(keys["ArrowRight"]==true)-s*(keys["ArrowLeft"]==true);
@@ -43,13 +42,17 @@ function input(){
         const dir=randomDir();
         btSys.add(100,240,dir.x,dir.y,dir.a);
     }
+    if(keys["KeyX"]==2){
+        canvas.requestFullscreen();
+        keys["KeyX"]=true
+    }
 }
 // Update the 'keys' object on keydown and keyup events
 document.addEventListener('keydown', (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
         e.preventDefault();
     }
-    keys[e.code] = true;
+    keys[e.code] = 2;
 });
 
 document.addEventListener('keyup', (e) => {
@@ -116,4 +119,9 @@ function gameLoop(){
     }
     //window.requestAnimationFrame(gameLoop); 
 }
+function loopInput(){
+input();
+window.requestAnimationFrame(loopInput); 
+}
+loopInput();
 //window.requestAnimationFrame(gameLoop); 
