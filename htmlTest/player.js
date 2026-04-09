@@ -77,8 +77,8 @@ class PlBtSystem{
             this.add(x+8,y);
         }
 
-        ctx.rotate(-Math.PI/2);
-        ctx.globalAlpha=.5;
+        //ctx.rotate(-Math.PI/2);
+        //ctx.globalAlpha=.5;
         for (let i = 0; i < this.x.length; ) {
             
             this.y[i]-=delta*s;
@@ -92,12 +92,12 @@ class PlBtSystem{
             }
             this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
            
-            ctx.drawImage(plImg,0,176,64,16,-this.y[i]-48,this.x[i]-8,64,16);
+          //  ctx.drawImage(plImg,0,176,64,16,-this.y[i]-48,this.x[i]-8,64,16);
             
             //this.debug(i);
             i++;
         }
-        ctx.globalAlpha=1;
-        ctx.rotate(Math.PI/2);
+        //ctx.globalAlpha=1;
+        //ctx.rotate(Math.PI/2);
     }
 }

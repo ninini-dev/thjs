@@ -1,6 +1,8 @@
-device=[];
+device=null;
+context=null;
+adapter=null;
 vertexData=[];
-storageBuffer=[];
+storageBuffer=null;
 bindGroup=[];
 pipeline=[];
 function createBuffer(){
@@ -22,9 +24,9 @@ device.queue.writeBuffer(vertexBuffer, 0, vertexData);
 
 function createSSBO(){
   
-const bufferSize=3;
+const ENTITIES_MAX=2048;
 storageBuffer = device.createBuffer({
-  size: 8*bufferSize,
+  size: 8*ENTITIES_MAX,
   usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
 });
  bindGroup = device.createBindGroup({
@@ -42,10 +44,14 @@ storageBuffer = device.createBuffer({
   device.queue.writeBuffer(storageBuffer, 0, instanceData);
 
 }
-async function rend(){
-const adapter = await navigator.gpu.requestAdapter();
+function updateSSBO(OFF,DATA){
+    device.queue.writeBuffer(storageBuffer, OFF, DATA);
+}
+async function rendInit(){
+  
+adapter = await navigator.gpu.requestAdapter();
 device = await adapter.requestDevice();
-const context = canvas.getContext('webgpu');
+context = canvas.getContext('webgpu');
 
 context.configure({
   device,
@@ -101,6 +107,11 @@ pipeline = device.createRenderPipeline({
     topology: 'triangle-strip',
   },
 });
+createSSBO();
+}
+
+function rend(){
+
 const commandEncoder = device.createCommandEncoder();
 const textureView = context.getCurrentTexture().createView();
 
@@ -116,12 +127,11 @@ const renderPass = commandEncoder.beginRenderPass({
 renderPass.setPipeline(pipeline);
 renderPass.setVertexBuffer(0, vertexBuffer); 
 
-createSSBO();
 renderPass.setBindGroup(0, bindGroup);
 
-renderPass.draw(4,3); // Draw 3 vertices
+renderPass.draw(4,enmSys.x.length); // Draw 3 vertices
 renderPass.end();
 
 device.queue.submit([commandEncoder.finish()]);
 }
-rend();
+rendInit();

@@ -42,6 +42,7 @@ function eventPlay(){
             e.t=0;
             e.rep--;
             enmSys.add(e.x,e.y,e.hp,e.asp,e.blen,e.b0,e.drop);
+        console.log("ENM");
         }
         if(e.rep<=0){
             eventLoop.queue.splice(i,1);

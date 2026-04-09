@@ -17,7 +17,7 @@ let plSys=new PlBtSystem();
 function main(){
     canvas = document.getElementById("gameCanvas");
 //	ctx = canvas.getContext("2d");
-ctx=canvas.getContext('webgpu');
+//ctx=canvas.getContext('webgpu');
 /*
     ctx.strokeStyle = "Blue";
     ctx.beginPath();
@@ -29,7 +29,8 @@ ctx=canvas.getContext('webgpu');
 }
 const keys = {};
 
-function input(){
+function 
+input(){
     var s=(keys["ShiftLeft"])?2.5:5;
     x += s*(keys["ArrowRight"]==true)-s*(keys["ArrowLeft"]==true);
     y += s*(keys["ArrowDown"]==true)-s*(keys["ArrowUp"]==true);
@@ -63,6 +64,7 @@ var y=0;
 var sx=32;
 var sy = 48;
 var anim=0;
+/*
 function draw(){
     //ctx.beginPath();
     
@@ -71,7 +73,7 @@ function draw(){
     
     ctx.drawImage(plImg,sx*Math.round(anim),0,sx,sy,x-16,y-24,sx,sy);
     //ctx.stroke();
-}
+}*/
 function debugGrid(){
     ctx.strokeStyle = "Green";
     for (let i = 0; i < 300; i+=16) {
@@ -103,25 +105,30 @@ function gameLoop(){
     let timeStep=1/60;
     if(Date.now()-lastTime>timeStep){
         lastTime=Date.now();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
         input();
-        draw();
+        //draw();
         //ctx.drawImage(btImg,0,32,16,16,150,240,16,16);
         btSys.update(1);
         if(btSys.mapCol({x,y})){
             
         }
+        eventLoop();
         enmSys.update(1);
         dropSys.update(1);
         plSys.update(1);
-        eventLoop();
-        debugGrid();
+        rend();
+        //debugGrid();
     }
-    //window.requestAnimationFrame(gameLoop); 
+    window.requestAnimationFrame(gameLoop); 
 }
 function loopInput(){
 input();
 window.requestAnimationFrame(loopInput); 
 }
 loopInput();
-//window.requestAnimationFrame(gameLoop); 
+async function loader(){
+    await rendInit();
+    window.requestAnimationFrame(gameLoop); 
+}
+loader();
