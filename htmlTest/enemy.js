@@ -16,7 +16,6 @@ class EnemySystem{
 
     dmgAudio=new Audio("res/wav/se_damage00.wav");
 
-
     mapAdd(pos,value){
         if(this.map.has(pos)) this.map.get(pos).push(value);
         else this.map.set(pos,[value]);

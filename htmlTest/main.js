@@ -1,5 +1,4 @@
-var ctx= null;
-var canvas=null;
+
 var plImg=new Image();
 plImg.src="res/pl00.png";
 
@@ -15,7 +14,7 @@ dropSys.img.src="res/item.png"
 let plSys=new PlBtSystem();
 
 function main(){
-    canvas = document.getElementById("gameCanvas");
+
 //	ctx = canvas.getContext("2d");
 //ctx=canvas.getContext('webgpu');
 /*
@@ -117,7 +116,7 @@ function gameLoop(){
         enmSys.update(1);
         dropSys.update(1);
         plSys.update(1);
-        rend();
+        Renderer.rend();
         //debugGrid();
     }
     window.requestAnimationFrame(gameLoop); 
@@ -128,7 +127,7 @@ window.requestAnimationFrame(loopInput);
 }
 loopInput();
 async function loader(){
-    await rendInit();
+    await Renderer.rendInit();
     window.requestAnimationFrame(gameLoop); 
 }
 loader();
