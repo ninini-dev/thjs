@@ -4,10 +4,14 @@ const Renderer = {
 
   createBuffer: () => {
     const vertexData = new Float32Array([
-      -32 / 300, -32 / 480,
-      -32 / 300, 32 / 480,
-      32 / 300, -32 / 480,
-      32 / 300, 32 / 480,
+      -1,-1,
+      -1,1,
+      1,-1,
+      1,1
+     // -32 / 300, -32 / 480,
+     // -32 / 300, 32 / 480,
+      //32 / 300, -32 / 480,
+     // 32 / 300, 32 / 480,
     ]);
     vertexBuffer = device.createBuffer({
       size: vertexData.byteLength,
@@ -35,7 +39,7 @@ const Renderer = {
 
     const res= await fetch('res/enemy.png'); 
     const blob = await res.blob();
-    IMG= createImageBitmap(blob);
+    IMG= await createImageBitmap(blob);
     //const response= await fetch('file:///C:/Users/W10/Desktop/thjs/htmlTest/res/enemy.png');
   
     sampler = device.createSampler({
@@ -48,14 +52,13 @@ const Renderer = {
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
     });
     device.queue.copyExternalImageToTexture(
-      { source: IMG },
+      { source: IMG ,flipY: true},
       { texture: texture },
       [IMG.width, IMG.height]
     );
   },
   createGpLayout: () => {
-
-    bindGroup = device.createBindGroup({
+    Renderer.bindGroup = device.createBindGroup({
       label: 'bind group for objects',
       layout: pipeline.getBindGroupLayout(0),
       entries: [
@@ -83,25 +86,45 @@ const Renderer = {
 struct VertexInput {
     @location(0) position: vec2<f32>,
 };
+struct VertexOutput {
+    @builtin(position) pos: vec4f,
+    @location(0) uv: vec2f, // This matches the fragment input
+};
 struct InstanceData {
     offset: vec2<f32>,
 };
 
 @group(0) @binding(0) var<storage, read> pos_per_ins: array<InstanceData>;
+@group(0) @binding(1) var mySampler: sampler;
+@group(0) @binding(2) var myTexture: texture_2d<f32>;
 @vertex
 fn vs_main(
   input: VertexInput,
   @builtin(instance_index) instanceIndex: u32 ,
   @builtin(vertex_index) vertexIndex : u32
-  ) -> @builtin(position) vec4f {
-  return vec4f( input.position+pos_per_ins[instanceIndex].offset, 0.0, 1.0);
+  ) -> VertexOutput {
+    var output: VertexOutput;
+    
+    output.pos = vec4f(input.position*vec2f(32.0/300, 32.0/480) + pos_per_ins[instanceIndex].offset, 0.0, 1.0);
+
+    var test = array<vec2f, 4>(
+        vec2f(0,1.0-16.0/256),
+        vec2f(0,1),
+        vec2f(16.0/256,1.0-16.0/256),
+        vec2f(16.0/256,1),
+    );
+
+    output.uv = test[vertexIndex];
+    
+    return output;
 }
-@group(0) @binding(2) var mySampler: sampler;
-@group(0) @binding(3) var myTexture: texture_2d<f32>;
 @fragment
-fn fs_main() -> @location(0) vec4f {
-  //return textureSample(myTexture, mySampler, uv);
-  return vec4f(1.0, 0.0, 0.0, 1.0); // Red color
+fn fs_main(input: VertexOutput) -> @location(0) vec4f {
+
+  var color: vec4f;
+  color= textureSample(myTexture, mySampler, input.uv);
+  return color;
+  //return vec4f(1.0, 0.0, 0.0, 1.0); // Red color
 }
 `;
 
@@ -124,7 +147,21 @@ fn fs_main() -> @location(0) vec4f {
       fragment: {
         module: shaderModule,
         entryPoint: 'fs_main',
-        targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
+        targets: [{ 
+          format: navigator.gpu.getPreferredCanvasFormat(),
+          blend: {
+          color: {
+            operation: 'add',
+            srcFactor: 'src-alpha',
+            dstFactor: 'one-minus-src-alpha',
+          },
+          alpha: {
+            operation: 'add',
+            srcFactor: 'one',
+            dstFactor: 'one-minus-src-alpha',
+          }
+        }
+        }],
       },
       primitive: {
         topology: 'triangle-strip',
