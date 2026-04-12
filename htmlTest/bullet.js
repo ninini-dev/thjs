@@ -93,11 +93,13 @@ class BulletSystem{
                 continue;
             }
             this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
+            /*
             ctx.translate(this.x[i],this.y[i]);
             ctx.rotate(this.a[i]);
             ctx.drawImage(btImg,0,16,16,16,-8,-8,16,16);
             ctx.rotate(-this.a[i]);
             ctx.translate(-this.x[i],-this.y[i]);
+             */
             //this.debug(i);
             i++;
         }

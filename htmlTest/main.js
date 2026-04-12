@@ -1,4 +1,5 @@
 
+
 var plImg=new Image();
 plImg.src="res/pl00.png";
 
@@ -43,8 +44,8 @@ input(){
     y += -s*(keys["ArrowDown"]==true)+s*(keys["ArrowUp"]==true);
     x=Math.min(x,canvas.width);
     y=Math.min(y,canvas.height);
-    x=Math.max(x,-canvas.width);
-    y=Math.max(y,-canvas.height);
+    x=Math.max(x,0);
+    y=Math.max(y,0);
 
     if(keys["KeyZ"]==true){
         const dir=randomDir();
@@ -127,8 +128,8 @@ function gameLoop(){
         }
         eventLoop();
         enmSys.update(1);
-        dropSys.update(1);
         plSys.update(1);
+        dropSys.update(1);
         Renderer.rend();
         //debugGrid();
     }

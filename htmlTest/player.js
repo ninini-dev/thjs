@@ -81,7 +81,7 @@ class PlBtSystem{
         //ctx.globalAlpha=.5;
         for (let i = 0; i < this.x.length; ) {
             
-            this.y[i]-=delta*s;
+            this.y[i]+=delta*s;
             if(this.x[i]<-16 || this.x[i]>316){
                 this.remove(i);
                 continue;
@@ -95,10 +95,13 @@ class PlBtSystem{
           //  ctx.drawImage(plImg,0,176,64,16,-this.y[i]-48,this.x[i]-8,64,16);
             
             //this.debug(i);
+            
+         const vertexData = new Float32Array([this.x[i],this.y[i]]);
+            device.queue.writeBuffer(storageBuffer,enmSys.x.length*8+i*8, vertexData);
             i++;
         }
-         const vertexData = new Float32Array([x/300,y/480]);
-            device.queue.writeBuffer(storageBuffer,0, vertexData);
+         const vertexData = new Float32Array([x,y]);
+            device.queue.writeBuffer(storageBuffer,enmSys.x.length*8+plSys.x.length*8, vertexData);
         //ctx.globalAlpha=1;
         //ctx.rotate(Math.PI/2);
     }

@@ -100,7 +100,7 @@ fn vs_main(
   ) -> VertexOutput {
     var output: VertexOutput;
     
-    output.pos = vec4f(input.position*vec2f(16.0/300, 16.0/480) + pos_per_ins[instanceIndex].offset, 0.0, 1.0);
+    output.pos = vec4f(input.position*vec2f(16.0/300, 16.0/480) + pos_per_ins[instanceIndex].offset/vec2f(150,240)-1, 0.0, 1.0);
 
     var test = array<vec2f, 4>(
         vec2f(0,1.0-16.0/256),
@@ -192,9 +192,9 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4f {
     renderPass.setVertexBuffer(0, vertexBuffer);
 
     renderPass.setBindGroup(0,GPL_PL00);
-    renderPass.draw(4, 1);
+    renderPass.draw(4, plSys.x.length+1,0,enmSys.x.length);
     renderPass.setBindGroup(0,GPL_ENM);
-    renderPass.draw(4, enmSys.x.length,0,1);
+    renderPass.draw(4, enmSys.x.length,0,0);
     renderPass.end();
 
     device.queue.submit([commandEncoder.finish()]);
