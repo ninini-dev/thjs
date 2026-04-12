@@ -44,7 +44,7 @@ class DropSystem{
             }
 
             const a=DROP_ASPECT_DATA[this.d[i]];
-            
+            /*
             ctx.translate(this.x[i],this.y[i]);
             ctx.rotate(this.a[i]);
             ctx.drawImage(
@@ -57,7 +57,7 @@ class DropSystem{
             );
             ctx.rotate(-this.a[i]);
             ctx.translate(-this.x[i],-this.y[i]);
-
+*/
             i++;
         }
     }

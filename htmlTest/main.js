@@ -26,17 +26,25 @@ function main(){
     console.log("xd");*/
     //alert("hi");
 }
-const keys = {};
+const keys = {
+    ShiftLeft:false,
+    ArrowRight:false,
+    ArrowLeft:false,
+    ArrowDown:false,
+    ArrowUp:false,
+    KeyZ:false,
+    KeyX:false
+};
 
 function 
 input(){
     var s=(keys["ShiftLeft"])?2.5:5;
     x += s*(keys["ArrowRight"]==true)-s*(keys["ArrowLeft"]==true);
-    y += s*(keys["ArrowDown"]==true)-s*(keys["ArrowUp"]==true);
+    y += -s*(keys["ArrowDown"]==true)+s*(keys["ArrowUp"]==true);
     x=Math.min(x,canvas.width);
     y=Math.min(y,canvas.height);
-    x=Math.max(x,0);
-    y=Math.max(y,0);
+    x=Math.max(x,-canvas.width);
+    y=Math.max(y,-canvas.height);
 
     if(keys["KeyZ"]==true){
         const dir=randomDir();
@@ -44,15 +52,20 @@ input(){
     }
     if(keys["KeyX"]==2){
         canvas.requestFullscreen();
-        keys["KeyX"]=true
     }
+   Object.keys(keys).forEach(k => {
+    if(keys[k]==2)
+        keys[k] = true;
+    });
 }
 // Update the 'keys' object on keydown and keyup events
 document.addEventListener('keydown', (e) => {
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
         e.preventDefault();
     }
-    keys[e.code] = 2;
+    if(keys[e.code] == false)
+        keys[e.code] = 2;
+    
 });
 
 document.addEventListener('keyup', (e) => {
@@ -78,13 +91,13 @@ function debugGrid(){
     for (let i = 0; i < 300; i+=16) {
         ctx.beginPath();
         ctx.moveTo(i,0);
-        ctx.lineTo(i,480)
+        ctx.lineTo(i,480);
         ctx.stroke();
     }  
     for (let i = 0; i < 480; i+=16) {
         ctx.beginPath();
         ctx.moveTo(0,i);
-        ctx.lineTo(300,i)
+        ctx.lineTo(300,i);
         ctx.stroke();
     } 
     ctx.strokeStyle = "Blue";

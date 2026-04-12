@@ -1,17 +1,22 @@
 var ctx= null;
 var canvas=null;
 const Renderer = {
-
+  createTextureBindGroup: (textureView) => {
+  return device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: storageBuffer }, // Keeping the same SSBO
+      { binding: 1, resource: sampler },       // Keeping the same Sampler
+      { binding: 2, resource: textureView }    // The NEW texture
+    ],
+  });
+},
   createBuffer: () => {
     const vertexData = new Float32Array([
       -1,-1,
       -1,1,
       1,-1,
       1,1
-     // -32 / 300, -32 / 480,
-     // -32 / 300, 32 / 480,
-      //32 / 300, -32 / 480,
-     // 32 / 300, 32 / 480,
     ]);
     vertexBuffer = device.createBuffer({
       size: vertexData.byteLength,
@@ -28,43 +33,33 @@ const Renderer = {
       size: 8 * ENTITIES_MAX,
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
-    const instanceData = new Float32Array([
-      -200 / 300, -200 / 480,
-      -200 / 300, 200 / 480,
-      200 / 300, -200 / 480,
-    ]);
-    device.queue.writeBuffer(storageBuffer, 0, instanceData);
   },
-  createTextureSampler: async (IMG) => {
+  createTexture: async (IMG) => {
 
-    const res= await fetch('res/enemy.png'); 
+    const res= await fetch('res/'+IMG+'.png'); 
     const blob = await res.blob();
     IMG= await createImageBitmap(blob);
-    //const response= await fetch('file:///C:/Users/W10/Desktop/thjs/htmlTest/res/enemy.png');
   
-    sampler = device.createSampler({
-      magFilter: 'linear',
-      minFilter: 'linear',
-    });
-    texture = device.createTexture({
+    let TEX = device.createTexture({
       size: [IMG.width, IMG.height,1],
       format: 'rgba8unorm',
       usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
     });
     device.queue.copyExternalImageToTexture(
       { source: IMG ,flipY: true},
-      { texture: texture },
+      { texture: TEX },
       [IMG.width, IMG.height]
     );
+    return TEX;
   },
-  createGpLayout: () => {
-    Renderer.bindGroup = device.createBindGroup({
-      label: 'bind group for objects',
+  createGpLayout: (TEX) => {
+    return device.createBindGroup({
+      //label: 'bind group for objects',
       layout: pipeline.getBindGroupLayout(0),
       entries: [
         { binding: 0, resource: storageBuffer },
         { binding: 1, resource: sampler },
-        { binding: 2, resource: texture.createView() }
+        { binding: 2, resource: TEX.createView() }
       ],
     });
   },
@@ -105,7 +100,7 @@ fn vs_main(
   ) -> VertexOutput {
     var output: VertexOutput;
     
-    output.pos = vec4f(input.position*vec2f(32.0/300, 32.0/480) + pos_per_ins[instanceIndex].offset, 0.0, 1.0);
+    output.pos = vec4f(input.position*vec2f(16.0/300, 16.0/480) + pos_per_ins[instanceIndex].offset, 0.0, 1.0);
 
     var test = array<vec2f, 4>(
         vec2f(0,1.0-16.0/256),
@@ -168,8 +163,15 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4f {
       },
     });
     Renderer.createSSBO();
-    await Renderer.createTextureSampler(0);
-    Renderer.createGpLayout();
+    sampler = device.createSampler({
+      magFilter: 'linear',
+      minFilter: 'linear',
+    });
+    TEX_ENM = await Renderer.createTexture('enemy');
+    TEX_PL00 =  await Renderer.createTexture('pl00');
+    GPL_ENM = Renderer.createGpLayout(TEX_ENM);
+    GPL_PL00 = Renderer.createGpLayout(TEX_PL00);
+    
   },
 
   rend: () => {
@@ -189,9 +191,10 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4f {
     renderPass.setPipeline(pipeline);
     renderPass.setVertexBuffer(0, vertexBuffer);
 
-    renderPass.setBindGroup(0,Renderer.bindGroup);
-
-    renderPass.draw(4, enmSys.x.length); // Draw 3 vertices
+    renderPass.setBindGroup(0,GPL_PL00);
+    renderPass.draw(4, 1);
+    renderPass.setBindGroup(0,GPL_ENM);
+    renderPass.draw(4, enmSys.x.length,0,1);
     renderPass.end();
 
     device.queue.submit([commandEncoder.finish()]);

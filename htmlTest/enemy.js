@@ -100,7 +100,7 @@ class EnemySystem{
                 const vertexData = new Float32Array([
       this.x[i]/300,this.y[i]/480,
 ]);
-            device.queue.writeBuffer(storageBuffer, i*8, vertexData);
+            device.queue.writeBuffer(storageBuffer, 8+i*8, vertexData);
             //ctx.drawImage(this.img,a.x,a.y,a.w,a.h,ePos.x-a.w/2,ePos.y-a.h/2,a.w,a.h);
 
             i++;

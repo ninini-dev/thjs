@@ -97,6 +97,8 @@ class PlBtSystem{
             //this.debug(i);
             i++;
         }
+         const vertexData = new Float32Array([x/300,y/480]);
+            device.queue.writeBuffer(storageBuffer,0, vertexData);
         //ctx.globalAlpha=1;
         //ctx.rotate(Math.PI/2);
     }
