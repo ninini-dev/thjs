@@ -123,9 +123,6 @@ function gameLoop(){
         //draw();
         //ctx.drawImage(btImg,0,32,16,16,150,240,16,16);
         btSys.update(1);
-        if(btSys.mapCol({x,y})){
-            
-        }
         eventLoop();
         enmSys.update(1);
         plSys.update(1);

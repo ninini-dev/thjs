@@ -29,7 +29,7 @@ class DropSystem{
 
     update(delta){
         for (let i = 0; i < this.x.length; ) {
-            this.y[i]+=delta*this.s[i];
+            this.y[i]-=delta*this.s[i];
             this.s[i]=Math.min(this.s[i]+1/10,2);
             
             if(this.y[i]>496){
@@ -44,20 +44,9 @@ class DropSystem{
             }
 
             const a=DROP_ASPECT_DATA[this.d[i]];
-            /*
-            ctx.translate(this.x[i],this.y[i]);
-            ctx.rotate(this.a[i]);
-            ctx.drawImage(
-                this.img,
-                a.x, a.y,
-                a.w, a.w,
-                -a.w/2,
-                -a.w/2,
-                a.w, a.w
-            );
-            ctx.rotate(-this.a[i]);
-            ctx.translate(-this.x[i],-this.y[i]);
-*/
+            const vertexData = new Float32Array([this.x[i],this.y[i]]);
+            Renderer.OFF_DROP=Renderer.OFF_PL+plSys.x.length+1;
+            device.queue.writeBuffer(storageBuffer,(Renderer.OFF_DROP+i)*8, vertexData);
             i++;
         }
     }

@@ -97,10 +97,9 @@ class EnemySystem{
             }
             this.mapAdd(posToHash(ePos),i);
             const a=ENEMY_ASPECT_DATA[this.asp[i]];
-                const vertexData = new Float32Array([
-      this.x[i],this.y[i],
-]);
+            const vertexData = new Float32Array([this.x[i],this.y[i]]);
             device.queue.writeBuffer(storageBuffer,i*8, vertexData);
+            
             //ctx.drawImage(this.img,a.x,a.y,a.w,a.h,ePos.x-a.w/2,ePos.y-a.h/2,a.w,a.h);
 
             i++;

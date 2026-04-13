@@ -77,8 +77,7 @@ class PlBtSystem{
             this.add(x+8,y);
         }
 
-        //ctx.rotate(-Math.PI/2);
-        //ctx.globalAlpha=.5;
+        Renderer.OFF_PL=enmSys.x.length;
         for (let i = 0; i < this.x.length; ) {
             
             this.y[i]+=delta*s;
@@ -92,17 +91,12 @@ class PlBtSystem{
             }
             this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
            
-          //  ctx.drawImage(plImg,0,176,64,16,-this.y[i]-48,this.x[i]-8,64,16);
-            
-            //this.debug(i);
-            
-         const vertexData = new Float32Array([this.x[i],this.y[i]]);
-            device.queue.writeBuffer(storageBuffer,enmSys.x.length*8+i*8, vertexData);
+            const vertexData = new Float32Array([this.x[i],this.y[i]]);
+            device.queue.writeBuffer(storageBuffer,(Renderer.OFF_PL+i)*8, vertexData);
             i++;
         }
+        let OFF_PL00 =Renderer.OFF_PL+ plSys.x.length;
          const vertexData = new Float32Array([x,y]);
-            device.queue.writeBuffer(storageBuffer,enmSys.x.length*8+plSys.x.length*8, vertexData);
-        //ctx.globalAlpha=1;
-        //ctx.rotate(Math.PI/2);
+            device.queue.writeBuffer(storageBuffer,OFF_PL00*8, vertexData);
     }
 }

@@ -1,16 +1,7 @@
 var ctx= null;
 var canvas=null;
 const Renderer = {
-  createTextureBindGroup: (textureView) => {
-  return device.createBindGroup({
-    layout: pipeline.getBindGroupLayout(0),
-    entries: [
-      { binding: 0, resource: storageBuffer }, // Keeping the same SSBO
-      { binding: 1, resource: sampler },       // Keeping the same Sampler
-      { binding: 2, resource: textureView }    // The NEW texture
-    ],
-  });
-},
+
   createBuffer: () => {
     const vertexData = new Float32Array([
       -1,-1,
@@ -25,6 +16,14 @@ const Renderer = {
 
     // Enviar los datos del CPU a la GPU
     device.queue.writeBuffer(vertexBuffer, 0, vertexData);
+  },
+
+  createUBO: ()=>{
+    const UNIFORM_MAX = 32;
+    uniformBuffer = device.createBuffer({
+      size: 16 * (UNIFORM_MAX+1),
+      usage: GPUBufferUsage.UNIFORM   | GPUBufferUsage.COPY_DST,
+    });
   },
 
   createSSBO: () => {
@@ -59,7 +58,8 @@ const Renderer = {
       entries: [
         { binding: 0, resource: storageBuffer },
         { binding: 1, resource: sampler },
-        { binding: 2, resource: TEX.createView() }
+        { binding: 2, resource: TEX.createView() },
+        { binding: 3, resource: uniformBuffer}
       ],
     });
   },
@@ -88,10 +88,15 @@ struct VertexOutput {
 struct InstanceData {
     offset: vec2<f32>,
 };
+struct GlobalData {
+    spriteData: array<vec4f,32>,
+    textureSize: f32,
+};
 
 @group(0) @binding(0) var<storage, read> pos_per_ins: array<InstanceData>;
 @group(0) @binding(1) var mySampler: sampler;
 @group(0) @binding(2) var myTexture: texture_2d<f32>;
+@group(0) @binding(3) var<uniform> global: GlobalData;
 @vertex
 fn vs_main(
   input: VertexInput,
@@ -99,14 +104,20 @@ fn vs_main(
   @builtin(vertex_index) vertexIndex : u32
   ) -> VertexOutput {
     var output: VertexOutput;
-    
-    output.pos = vec4f(input.position*vec2f(16.0/300, 16.0/480) + pos_per_ins[instanceIndex].offset/vec2f(150,240)-1, 0.0, 1.0);
+    var wh: vec2f;
+    wh=global.spriteData[0].zw;
+    var xy: vec2f;
+    xy=global.spriteData[0].xy;
+    xy.y=-xy.y;
 
+    output.pos = vec4f(input.position*wh*.5/vec2f(300,480) + pos_per_ins[instanceIndex].offset/vec2f(150,240)-1, 0.0, 1.0);
+    var s:f32;
+    s=global.textureSize;
     var test = array<vec2f, 4>(
-        vec2f(0,1.0-16.0/256),
-        vec2f(0,1),
-        vec2f(16.0/256,1.0-16.0/256),
-        vec2f(16.0/256,1),
+        (vec2f(0,s-wh.y)+xy)/s,
+        (vec2f(0,s)+xy)/s,
+        (vec2f(wh.x,s-wh.y)+xy)/s,
+        (vec2f(wh.x,s)+xy)/s,
     );
 
     output.uv = test[vertexIndex];
@@ -163,15 +174,17 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4f {
       },
     });
     Renderer.createSSBO();
+    Renderer.createUBO();
     sampler = device.createSampler({
       magFilter: 'linear',
       minFilter: 'linear',
     });
     TEX_ENM = await Renderer.createTexture('enemy');
     TEX_PL00 =  await Renderer.createTexture('pl00');
+    TEX_DROP =  await Renderer.createTexture('item');
     GPL_ENM = Renderer.createGpLayout(TEX_ENM);
     GPL_PL00 = Renderer.createGpLayout(TEX_PL00);
-    
+    GPL_DROP = Renderer.createGpLayout(TEX_DROP);
   },
 
   rend: () => {
@@ -190,11 +203,16 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4f {
 
     renderPass.setPipeline(pipeline);
     renderPass.setVertexBuffer(0, vertexBuffer);
-
+    device.queue.writeBuffer(uniformBuffer, 0,new Float32Array([0,0,32,48]));
+    device.queue.writeBuffer(uniformBuffer, 32*16,new Float32Array([256.0]));
     renderPass.setBindGroup(0,GPL_PL00);
-    renderPass.draw(4, plSys.x.length+1,0,enmSys.x.length);
+    renderPass.draw(4, plSys.x.length+1,0,Renderer.OFF_PL);
+    device.queue.writeBuffer(uniformBuffer, 0,new Float32Array([32,32,32.0,32.0]));
+    device.queue.writeBuffer(uniformBuffer, 32*16,new Float32Array([512.0]));
     renderPass.setBindGroup(0,GPL_ENM);
     renderPass.draw(4, enmSys.x.length,0,0);
+    renderPass.setBindGroup(0,GPL_DROP);
+    renderPass.draw(4, dropSys.x.length,0,Renderer.OFF_DROP);
     renderPass.end();
 
     device.queue.submit([commandEncoder.finish()]);
