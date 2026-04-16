@@ -1,5 +1,4 @@
 -create enm momevemnt relative to position origin
--collsion optimization
 -audio
 -enm drop list
 -game events
@@ -27,3 +26,10 @@ Event{
   repeats
   delay
 }
+
+=====================
+TO DO
+==========================
+-[] remove spatial hash map functions from bullet.js
+-[] remove legacy rendering stuff from bullet.js
+-[] x -> PlayerSystem.px
