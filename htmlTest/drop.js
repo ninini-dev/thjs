@@ -42,11 +42,8 @@ class DropSystem{
                 this.remove(i);
                 continue;
             }
-
-            const a=DROP_ASPECT_DATA[this.d[i]];
-            const vertexData = new Float32Array([this.x[i],this.y[i]]);
-            Renderer.OFF_DROP=Renderer.OFF_PL+plSys.x.length+1;
-            device.queue.writeBuffer(storageBuffer,(Renderer.OFF_DROP+i)*8, vertexData);
+            Renderer.writeVBO([this.x[i],this.y[i],DROP_ASPECT_DATA[this.d[i]],this.a[i]],Renderer.OFF_DROP+i)
+    
             i++;
         }
     }

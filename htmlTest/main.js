@@ -122,12 +122,14 @@ function gameLoop(){
         input();
         //draw();
         //ctx.drawImage(btImg,0,32,16,16,150,240,16,16);
-        btSys.update(1);
+        
         eventLoop();
         enmSys.update(1);
         plSys.update(1);
         dropSys.update(1);
+        btSys.update(1);
         Renderer.rend();
+        
         //debugGrid();
     }
     window.requestAnimationFrame(gameLoop); 

@@ -7,6 +7,14 @@ function randomDir(){
     const dy=Math.sin(a);
     return {x:dx,y:dy,a:a};
 }
+function AABB(ax,ay,bx,by,wa,wb){
+    let colX = ax + wa >= bx &&
+        bx + wb >= ax;
+    let colY = ay + wa >= by &&
+        by + wb >= ay;
+    return colX&&colY;
+}  
+
 class BulletSystem{
     map=new Map();   
     x=[];
@@ -76,9 +84,10 @@ class BulletSystem{
         ctx.moveTo(0,0);
     }
     update(delta) {
-        this.map.clear();
+        //this.map.clear();
         const s=1;
         //ctx.drawImage(btImg,0,16,16,16,100,240,16,16);
+        Renderer.OFF_BT=Renderer.OFF_DROP+dropSys.x.length;
         for (let i = 0; i < this.x.length; ) {
             
             this.x[i]+=this.dx[i]*delta*s;
@@ -92,7 +101,13 @@ class BulletSystem{
                 this.remove(i);
                 continue;
             }
-            this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
+            if(AABB(x,y,this.x[i],this.y[i],2,2))
+            {
+                this.remove(i);
+                continue;
+            }
+            //this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
+            Renderer.writeVBO([this.x[i],this.y[i],0],Renderer.OFF_BT+i)
             /*
             ctx.translate(this.x[i],this.y[i]);
             ctx.rotate(this.a[i]);

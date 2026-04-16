@@ -91,12 +91,13 @@ class PlBtSystem{
             }
             this.mapAdd(posToHash({x:this.x[i],y:this.y[i]}),i);
            
-            const vertexData = new Float32Array([this.x[i],this.y[i]]);
-            device.queue.writeBuffer(storageBuffer,(Renderer.OFF_PL+i)*8, vertexData);
+            Renderer.writeVBO([this.x[i],this.y[i],1,-Math.PI*.5],Renderer.OFF_PL+i)
             i++;
+            
         }
-        let OFF_PL00 =Renderer.OFF_PL+ plSys.x.length;
-         const vertexData = new Float32Array([x,y]);
-            device.queue.writeBuffer(storageBuffer,OFF_PL00*8, vertexData);
+        Renderer.OFF_DROP=Renderer.OFF_PL+plSys.x.length;
+        Renderer.writeVBO([x,y,0,0],Renderer.OFF_DROP)
+        Renderer.OFF_DROP++;
+
     }
 }
