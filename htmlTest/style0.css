@@ -12,6 +12,12 @@ table
     border: 1px solid saddlebrown;
     width: 600;
 }
+#container{
+    position: relative;
+ 
+}
 canvas{
-    border: 1px solid black;
+    position: absolute;
+    border: 1px solid #F11;
+    background: #1F11;
 }

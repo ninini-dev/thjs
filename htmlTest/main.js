@@ -52,7 +52,8 @@ input(){
         btSys.add(100,240,dir.x,dir.y,dir.a);
     }
     if(keys["KeyX"]==2){
-        canvas.requestFullscreen();
+        document.getElementById("container").requestFullscreen();
+        //canvas.requestFullscreen();
     }
    Object.keys(keys).forEach(k => {
     if(keys[k]==2)
@@ -144,3 +145,26 @@ async function loader(){
     window.requestAnimationFrame(gameLoop); 
 }
 loader();
+
+uiCanvas = document.getElementById("uiCanvas");
+uCtx = uiCanvas.getContext("2d");
+
+uCtx.strokeStyle="#FF5733"
+uCtx.beginPath();
+uCtx.arc(150, 240, 20, 0, Math.PI * 2);
+uCtx.rect(150-20/2,120-20/2,20,20);
+uCtx.stroke();
+
+
+// 1. Set the style
+uCtx.fillStyle = "white";      // Color of the text
+uCtx.font = "bold 24px Arial"; // Style, Size, and Font Family
+uCtx.textAlign = "center";     // Alignment (left, center, right)
+
+// 2. Draw the text
+// fillText("String", x, y)
+uCtx.fillText("SCORE: 100", 150, 50);
+
+uCtx.font = "18px serif";
+uCtx.textAlign = "right";
+uCtx.fillText("lvl 1", 310, 30); // Pins text to the top-right corner
